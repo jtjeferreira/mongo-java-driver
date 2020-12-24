@@ -99,6 +99,13 @@ configure(javaProjects) {
 }
 
 configure(scalaProjects) {
+    def withDottyCompat = { s ->
+      if(project.scalaVersion.startsWith("3")) {
+        return s.replace("%%", "2.13")
+      } else {
+        return s
+      }
+    }
     apply plugin: 'scala'
     apply plugin: 'idea'
     apply plugin: "com.adtran.scala-multiversion-plugin"
@@ -110,14 +117,20 @@ configure(scalaProjects) {
     targetCompatibility = JavaVersion.VERSION_1_8
 
     dependencies {
-        compile ('org.scala-lang:scala-library:%scala-version%')
-        compile ('org.scala-lang:scala-reflect:%scala-version%')
+        if (project.scalaVersion.startsWith("3")) {
+            compile ("org.scala-lang:scala3-library_${project.scalaVersion}:%scala-version%")
+            //no reflection
+        } else {
+            compile ('org.scala-lang:scala-library:%scala-version%')
+            compile ('org.scala-lang:scala-reflect:%scala-version%')
+        }
+
 
         testImplementation(platform("org.junit:junit-bom:$junitBomVersion"))
         testImplementation("org.junit.vintage:junit-vintage-engine")
 
-        testImplementation('org.scalatest:scalatest_%%:3.0.8')
-        testImplementation('org.scalamock:scalamock_%%:4.4.0')
+        testImplementation(withDottyCompat('org.scalatest:scalatest_%%:3.0.8'))
+        testImplementation(withDottyCompat('org.scalamock:scalamock_%%:4.4.0'))
         testImplementation('ch.qos.logback:logback-classic:1.1.3')
         testImplementation('org.reflections:reflections:0.9.10')
     }

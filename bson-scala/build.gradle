@@ -25,7 +25,7 @@ sourceSets {
     main {
         scala {
             srcDirs += ["src/main/scala"]
-            if(scalaVersion.startsWith("2.13")) {
+            if(scalaVersion.startsWith("2.13") || scalaVersion.startsWith("3")) {
                 srcDirs += ["src/main/scala-2.13+"]
             } else {
                 srcDirs += ["src/main/scala-2.13-"]
